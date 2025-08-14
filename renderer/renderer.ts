@@ -1,9 +1,12 @@
 import './types.js'
+import type { FileTreeItem } from './types.js'
 
 const $ = (sel: string) => document.querySelector(sel) as HTMLElement
 
 const editor = $('#editor') as HTMLTextAreaElement
 const toast = $('#toast') as HTMLDivElement
+const fileTree = $('#file-tree') as HTMLDivElement
+const refreshBtn = $('#refresh-btn') as HTMLButtonElement
 
 // 헤더 버튼들
 const encryptBtn = $('#encrypt-btn') as HTMLButtonElement
@@ -24,6 +27,82 @@ function getCryptoParams() {
   return { password, salt }
 }
 
+// 파일 트리 렌더링
+function renderFileTree(items: FileTreeItem[], container: HTMLElement) {
+  container.innerHTML = ''
+  
+  if (!items || items.length === 0) {
+    container.innerHTML = '<div style="padding: 16px; color: #6b7280;">파일이 없습니다.</div>'
+    return
+  }
+
+  items.forEach(item => {
+    const itemEl = document.createElement('div')
+    itemEl.className = `tree-item ${item.type}`
+    itemEl.textContent = item.name
+    itemEl.setAttribute('data-path', item.path)
+    
+    if (item.type === 'file') {
+      itemEl.addEventListener('dblclick', async () => {
+        await openFile(item.path)
+      })
+    }
+    
+    container.appendChild(itemEl)
+    
+    if (item.type === 'directory' && item.children && item.children.length > 0) {
+      const childrenContainer = document.createElement('div')
+      childrenContainer.className = 'tree-children'
+      renderFileTree(item.children, childrenContainer)
+      container.appendChild(childrenContainer)
+    }
+  })
+}
+
+// 파일 열기 및 복호화
+async function openFile(filePath: string) {
+  try {
+    showToast('파일을 읽는 중...')
+    const content = await window.gemini.readRepositoryFile(filePath)
+    
+    // 파일 내용을 복호화 시도
+    const { password, salt } = getCryptoParams()
+    const { plain, rememberedKeys: keys } = await window.gemini.parseAndDecrypt(content, password, salt)
+    
+    editor.value = plain
+    rememberedKeys = new Set(keys)
+    
+    showToast(`파일 "${filePath}"을 열었습니다.`)
+  } catch (error: any) {
+    showToast('파일 읽기 실패: ' + (error?.message ?? '알 수 없는 오류'))
+  }
+}
+
+// 파일 트리 새로고침
+async function refreshFileTree() {
+  try {
+    fileTree.innerHTML = 'Loading...'
+    const files = await window.gemini.refreshRepository()
+    renderFileTree(files, fileTree)
+  } catch (error: any) {
+    fileTree.innerHTML = '<div style="padding: 16px; color: #ef4444;">로드 실패</div>'
+    showToast('파일 목록 새로고침 실패: ' + (error?.message ?? '알 수 없는 오류'))
+  }
+}
+
+// 초기 파일 트리 로드
+async function loadInitialFileTree() {
+  try {
+    const files = await window.gemini.getRepositoryFiles()
+    renderFileTree(files, fileTree)
+  } catch (error: any) {
+    fileTree.innerHTML = '<div style="padding: 16px; color: #ef4444;">로드 실패</div>'
+  }
+}
+
+// 이벤트 리스너들
+refreshBtn.addEventListener('click', refreshFileTree)
+
 // 버튼 이벤트 핸들러
 encryptBtn.addEventListener('click', async () => {
   await window.gemini.openEncrypt()
@@ -32,6 +111,9 @@ encryptBtn.addEventListener('click', async () => {
 decryptBtn.addEventListener('click', async () => {
   await window.gemini.openDecrypt()
 })
+
+// 페이지 로드 시 파일 트리 초기화
+document.addEventListener('DOMContentLoaded', loadInitialFileTree)
 
 // Paste 트리거: 붙여넣는 텍스트를 자동 복호화 & 키 기억
 editor.addEventListener('paste', async (e: ClipboardEvent) => {

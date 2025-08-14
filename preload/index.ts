@@ -7,6 +7,11 @@ contextBridge.exposeInMainWorld('gemini', {
   openEncrypt: () => ipcRenderer.invoke('window:open-encrypt'),
   openDecrypt: () => ipcRenderer.invoke('window:open-decrypt'),
 
+  // Repository management
+  getRepositoryFiles: () => ipcRenderer.invoke('repo:get-files'),
+  readRepositoryFile: (filePath: string) => ipcRenderer.invoke('repo:read-file', filePath),
+  refreshRepository: () => ipcRenderer.invoke('repo:refresh'),
+
   // Crypto APIs
   encrypt: (plainText: string, password: string, salt: string) =>
     ipcRenderer.invoke('crypto:encrypt', plainText, password, salt),
