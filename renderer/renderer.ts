@@ -12,8 +12,6 @@ declare global {
 
 const $ = (sel: string) => document.querySelector(sel) as HTMLElement
 
-const keyInput = $('#key') as HTMLInputElement
-const saltInput = $('#salt') as HTMLInputElement
 const editor = $('#editor') as HTMLTextAreaElement
 const toast = $('#toast') as HTMLDivElement
 
@@ -27,12 +25,9 @@ function showToast(msg: string) {
 }
 
 function getCryptoParams() {
-  const password = keyInput.value.trim()
-  if (!password) throw new Error('encrypt key를 입력하세요')
-  let salt = saltInput.value.trim()
-  if (!salt) salt = 'deadbeef' // 운영에서는 조직 고정 salt를 명시 입력 권장
-  if (!/^[0-9a-fA-F]+$/.test(salt)) throw new Error('salt는 hex 문자열이어야 합니다')
-  return { password, salt: salt.toLowerCase() }
+  const password = 'nice7700@!' // 고정된 비밀번호
+  const salt = 'deadbeef' // 고정된 salt
+  return { password, salt }
 }
 
 // Paste 트리거: 붙여넣는 텍스트를 자동 복호화 & 키 기억
@@ -85,11 +80,7 @@ editor.addEventListener('paste', async (e: ClipboardEvent) => {
     }
   } catch (err: any) {
     console.error('Error during paste event:', err); // Added log
-    // getCryptoParams() 실패 등 주요 오류는 사용자에게 알림
-    if (err.message.includes('encrypt key') || err.message.includes('salt')) {
-      showToast('오류: ' + err.message)
-    }
-    // 그 외 암호문 형식 오류 등은 그냥 붙여넣기 되도록 허용 (기존 동작 유지)
+    // 암호문 형식 오류 등은 그냥 붙여넣기 되도록 허용 (기존 동작 유지)
   }
 })
 
