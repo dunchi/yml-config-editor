@@ -3,6 +3,10 @@ import { contextBridge, ipcRenderer } from 'electron'
 contextBridge.exposeInMainWorld('gemini', {
   writeClipboard: (text: string) => ipcRenderer.invoke('clipboard:writeText', text),
 
+  // Window control
+  openEncrypt: () => ipcRenderer.invoke('window:open-encrypt'),
+  openDecrypt: () => ipcRenderer.invoke('window:open-decrypt'),
+
   // Crypto APIs
   encrypt: (plainText: string, password: string, salt: string) =>
     ipcRenderer.invoke('crypto:encrypt', plainText, password, salt),

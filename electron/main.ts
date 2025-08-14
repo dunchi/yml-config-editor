@@ -7,6 +7,8 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 let win: BrowserWindow | null = null
+let encryptWindow: BrowserWindow | null = null
+let decryptWindow: BrowserWindow | null = null
 
 async function createWindow() {
   win = new BrowserWindow({
@@ -23,6 +25,60 @@ async function createWindow() {
   await win.loadFile(file)
 }
 
+async function createEncryptWindow() {
+  if (encryptWindow) {
+    encryptWindow.focus()
+    return
+  }
+
+  encryptWindow = new BrowserWindow({
+    width: 500,
+    height: 400,
+    resizable: true,
+    minimizable: false,
+    maximizable: false,
+    parent: win || undefined,
+    modal: false,
+    webPreferences: {
+      preload: path.join(__dirname, '..', 'preload', 'index.cjs')
+    }
+  })
+
+  const encryptFile = path.join(__dirname, '..', 'renderer', 'encrypt.html')
+  await encryptWindow.loadFile(encryptFile)
+
+  encryptWindow.on('closed', () => {
+    encryptWindow = null
+  })
+}
+
+async function createDecryptWindow() {
+  if (decryptWindow) {
+    decryptWindow.focus()
+    return
+  }
+
+  decryptWindow = new BrowserWindow({
+    width: 500,
+    height: 400,
+    resizable: true,
+    minimizable: false,
+    maximizable: false,
+    parent: win || undefined,
+    modal: false,
+    webPreferences: {
+      preload: path.join(__dirname, '..', 'preload', 'index.cjs')
+    }
+  })
+
+  const decryptFile = path.join(__dirname, '..', 'renderer', 'decrypt.html')
+  await decryptWindow.loadFile(decryptFile)
+
+  decryptWindow.on('closed', () => {
+    decryptWindow = null
+  })
+}
+
 app.whenReady().then(() => {
   createWindow()
   app.on('activate', () => {
@@ -32,6 +88,15 @@ app.whenReady().then(() => {
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit()
+})
+
+// Window control
+ipcMain.handle('window:open-encrypt', () => {
+  createEncryptWindow()
+})
+
+ipcMain.handle('window:open-decrypt', () => {
+  createDecryptWindow()
 })
 
 // Clipboard bridge

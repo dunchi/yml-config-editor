@@ -10,15 +10,6 @@
     header { padding: 12px 16px; border-bottom: 1px solid #e5e7eb; display: flex; gap: 12px; align-items: center; }
     .header-btn { padding: 8px 16px; border: 1px solid #cbd5e1; border-radius: 8px; background: white; cursor: pointer; font-size: 14px; }
     .header-btn:hover { background: #f8fafc; }
-    .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; }
-    .modal.show { display: flex; }
-    .modal-content { background: white; border-radius: 12px; padding: 24px; width: 500px; max-width: 90vw; }
-    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-    .modal-title { font-size: 18px; font-weight: 600; }
-    .close-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: #64748b; }
-    .form-group { margin-bottom: 16px; }
-    .form-label { display: block; margin-bottom: 6px; font-weight: 500; color: #374151; }
-    .form-input { width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; resize: vertical; min-height: 80px; }
     main { padding: 0; }
     textarea { box-sizing: border-box; width: 100%; height: 100%; border: 0; padding: 16px; font: 14px/1.5 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
     .footer { padding: 8px 12px; border-top: 1px solid #e5e7eb; color:#64748b; font-size:12px; display:flex; justify-content:space-between; }
@@ -39,42 +30,6 @@
     <div class="footer">
       <div>붙여넣기 시 <em>암호화된 값이었던 키</em>를 자동 추적합니다. 저장(Cmd+S) 시 해당 키 값만 재암호화 → 클립보드.</div>
       <div>© gemini.md</div>
-    </div>
-  </div>
-
-  <!-- 암호화 모달 -->
-  <div class="modal" id="encrypt-modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3 class="modal-title">단일 암호화</h3>
-        <button class="close-btn" id="encrypt-close">&times;</button>
-      </div>
-      <div class="form-group">
-        <label class="form-label">원문 입력</label>
-        <textarea class="form-input" id="encrypt-input" placeholder="암호화할 텍스트를 입력하세요"></textarea>
-      </div>
-      <div class="form-group">
-        <label class="form-label">암호화 결과</label>
-        <textarea class="form-input" id="encrypt-output" placeholder="암호화된 결과가 여기에 표시됩니다" readonly></textarea>
-      </div>
-    </div>
-  </div>
-
-  <!-- 복호화 모달 -->
-  <div class="modal" id="decrypt-modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3 class="modal-title">단일 복호화</h3>
-        <button class="close-btn" id="decrypt-close">&times;</button>
-      </div>
-      <div class="form-group">
-        <label class="form-label">암호화된 텍스트 입력</label>
-        <textarea class="form-input" id="decrypt-input" placeholder="복호화할 암호화된 텍스트를 입력하세요"></textarea>
-      </div>
-      <div class="form-group">
-        <label class="form-label">복호화 결과</label>
-        <textarea class="form-input" id="decrypt-output" placeholder="복호화된 결과가 여기에 표시됩니다" readonly></textarea>
-      </div>
     </div>
   </div>
   <div class="toast" id="toast">암호화되어 클립보드에 복사했습니다.</div>

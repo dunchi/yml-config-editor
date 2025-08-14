@@ -6,7 +6,7 @@
   "main": "dist/electron/main.js",
   "scripts": {
     "dev": "npm run build && electron .",
-    "build": "rm -rf dist && tsc && cp renderer/index.html dist/renderer/index.html && tsc --module commonjs --outDir dist/preload preload/index.ts && mv dist/preload/index.js dist/preload/index.cjs"
+    "build": "rm -rf dist && tsc && cp renderer/*.html dist/renderer/ && tsc --module commonjs --outDir dist/preload preload/index.ts && mv dist/preload/index.js dist/preload/index.cjs"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

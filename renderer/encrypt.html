@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'"> 
+  <title>단일 암호화</title>
+  <style>
+    html, body { height: 100%; margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Roboto, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif; }
+    .container { padding: 20px; height: calc(100% - 40px); display: flex; flex-direction: column; }
+    .header { margin-bottom: 20px; }
+    .title { font-size: 18px; font-weight: 600; margin: 0; }
+    .form-group { margin-bottom: 16px; flex: 1; display: flex; flex-direction: column; }
+    .form-label { display: block; margin-bottom: 6px; font-weight: 500; color: #374151; }
+    .form-input { flex: 1; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; resize: none; }
+    .form-input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+    .readonly { background-color: #f9fafb; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1 class="title">단일 암호화</h1>
+    </div>
+    <div class="form-group">
+      <label class="form-label">원문 입력</label>
+      <textarea class="form-input" id="encrypt-input" placeholder="암호화할 텍스트를 입력하세요"></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">암호화 결과</label>
+      <textarea class="form-input readonly" id="encrypt-output" placeholder="암호화된 결과가 여기에 표시됩니다" readonly></textarea>
+    </div>
+  </div>
+  <script type="module" src="./encrypt.js"></script>
+</body>
+</html>
