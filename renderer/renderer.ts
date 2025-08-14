@@ -2,6 +2,7 @@ declare global {
   interface Window {
     gemini: {
       writeClipboard: (text: string) => Promise<void>;
+      encrypt: (plainText: string, password: string, salt: string) => Promise<string>;
       decrypt: (cipherText: string, password: string, salt: string) => Promise<string>;
       parseAndDecrypt: (data: string, password: string, salt: string) => Promise<{ plain: string; rememberedKeys: string[] }>;
       reEncrypt: (current: string, rememberedKeys: string[], password: string, salt: string) => Promise<string>;
@@ -14,6 +15,18 @@ const $ = (sel: string) => document.querySelector(sel) as HTMLElement
 
 const editor = $('#editor') as HTMLTextAreaElement
 const toast = $('#toast') as HTMLDivElement
+
+// 모달 관련 요소들
+const encryptBtn = $('#encrypt-btn') as HTMLButtonElement
+const decryptBtn = $('#decrypt-btn') as HTMLButtonElement
+const encryptModal = $('#encrypt-modal') as HTMLDivElement
+const decryptModal = $('#decrypt-modal') as HTMLDivElement
+const encryptClose = $('#encrypt-close') as HTMLButtonElement
+const decryptClose = $('#decrypt-close') as HTMLButtonElement
+const encryptInput = $('#encrypt-input') as HTMLTextAreaElement
+const encryptOutput = $('#encrypt-output') as HTMLTextAreaElement
+const decryptInput = $('#decrypt-input') as HTMLTextAreaElement
+const decryptOutput = $('#decrypt-output') as HTMLTextAreaElement
 
 // 기억한 키들: 사용자가 paste로 넣었을 때 {cipher} 값이었던 키 목록
 let rememberedKeys: Set<string> = new Set()
@@ -29,6 +42,80 @@ function getCryptoParams() {
   const salt = 'deadbeef' // 고정된 salt
   return { password, salt }
 }
+
+// 모달 이벤트 핸들러
+encryptBtn.addEventListener('click', () => {
+  encryptModal.classList.add('show')
+  encryptInput.focus()
+})
+
+decryptBtn.addEventListener('click', () => {
+  decryptModal.classList.add('show')
+  decryptInput.focus()
+})
+
+encryptClose.addEventListener('click', () => {
+  encryptModal.classList.remove('show')
+})
+
+decryptClose.addEventListener('click', () => {
+  decryptModal.classList.remove('show')
+})
+
+// 모달 배경 클릭시 닫기
+encryptModal.addEventListener('click', (e) => {
+  if (e.target === encryptModal) {
+    encryptModal.classList.remove('show')
+  }
+})
+
+decryptModal.addEventListener('click', (e) => {
+  if (e.target === decryptModal) {
+    decryptModal.classList.remove('show')
+  }
+})
+
+// 암호화 입력 이벤트
+encryptInput.addEventListener('input', async () => {
+  const text = encryptInput.value.trim()
+  if (!text) {
+    encryptOutput.value = ''
+    return
+  }
+  
+  try {
+    const { password, salt } = getCryptoParams()
+    const encrypted = await window.gemini.encrypt(text, password, salt)
+    encryptOutput.value = `{cipher}${encrypted}`
+  } catch (err: any) {
+    encryptOutput.value = '오류: ' + (err?.message ?? '암호화 실패')
+  }
+})
+
+encryptInput.addEventListener('paste', async () => {
+  // paste 이벤트 후 input 이벤트가 발생하므로 별도 처리 불필요
+})
+
+// 복호화 입력 이벤트
+decryptInput.addEventListener('input', async () => {
+  const text = decryptInput.value.trim()
+  if (!text) {
+    decryptOutput.value = ''
+    return
+  }
+  
+  try {
+    const { password, salt } = getCryptoParams()
+    const decrypted = await window.gemini.decrypt(text, password, salt)
+    decryptOutput.value = decrypted
+  } catch (err: any) {
+    decryptOutput.value = '오류: ' + (err?.message ?? '복호화 실패')
+  }
+})
+
+decryptInput.addEventListener('paste', async () => {
+  // paste 이벤트 후 input 이벤트가 발생하므로 별도 처리 불필요
+})
 
 // Paste 트리거: 붙여넣는 텍스트를 자동 복호화 & 키 기억
 editor.addEventListener('paste', async (e: ClipboardEvent) => {

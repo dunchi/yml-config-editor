@@ -41,6 +41,10 @@ ipcMain.handle('clipboard:writeText', (_evt, text: string) => {
 })
 
 // Crypto bridges
+ipcMain.handle('crypto:encrypt', (_evt, plainText: string, password: string, salt: string) => {
+  return springEncrypt(plainText, password, salt)
+})
+
 ipcMain.handle('crypto:decrypt', (_evt, cipherText: string, password: string, salt: string) => {
   return springDecrypt(cipherText, password, salt)
 })

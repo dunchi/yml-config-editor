@@ -4,6 +4,9 @@ contextBridge.exposeInMainWorld('gemini', {
   writeClipboard: (text: string) => ipcRenderer.invoke('clipboard:writeText', text),
 
   // Crypto APIs
+  encrypt: (plainText: string, password: string, salt: string) =>
+    ipcRenderer.invoke('crypto:encrypt', plainText, password, salt),
+
   decrypt: (cipherText: string, password: string, salt: string) =>
     ipcRenderer.invoke('crypto:decrypt', cipherText, password, salt),
 
